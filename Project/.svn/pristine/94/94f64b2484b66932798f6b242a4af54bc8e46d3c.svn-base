@@ -1,0 +1,19 @@
+package ir.assignments.three;
+
+import java.util.Collection;
+
+public class Main {
+	public static void main(String[] args) {
+		// Keep track of crawl time
+		StopWatch watch = new StopWatch();
+
+		// Do crawl
+		DocumentStorage documentStorage = new DocumentStorage("docStorage");
+		watch.start();
+		Collection<String> crawledUrls = Crawler.crawl("http://www.ics.uci.edu", documentStorage);
+		watch.stop();
+
+		// Answer homework questions
+		AnswerQuestions.Answer(watch.getTotalElapsedSeconds(), crawledUrls, documentStorage);
+	}
+}

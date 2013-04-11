@@ -1,0 +1,25 @@
+package ir.assignments.four.web;
+
+public class WebResultSet {
+	private SearchResult[] results;
+	private int totalHits;
+	private int currentPage;
+	
+	public WebResultSet(SearchResult[] results, int totalHits, int currentPage) {
+		this.results = results;
+		this.totalHits = totalHits;
+		this.currentPage = currentPage;
+	}
+	
+	public SearchResult[] getResults() {
+		return this.results;
+	}
+	
+	public int getTotalPages(int maxPerPage) {
+		return Math.min(totalHits / maxPerPage, 20); // limit to top 20 pages
+	}
+	
+	public int getCurrentPage() { 
+		return this.currentPage;
+	}
+}

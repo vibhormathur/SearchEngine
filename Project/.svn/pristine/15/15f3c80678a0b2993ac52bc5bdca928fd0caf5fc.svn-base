@@ -1,0 +1,70 @@
+package ir.assignments.four;
+
+import java.util.HashMap;
+
+import ir.assignments.three.storage.DocumentLinkData;
+import ir.assignments.three.storage.DocumentStorage;
+import ir.assignments.three.storage.HtmlDocument;
+import ir.assignments.three.storage.IDocumentStorage;
+import ir.assignments.three.storage.LinkDataStorage;
+
+public class GraphAnalyzer {
+
+	public static void main(String[] args) {
+		GraphAnalyzer k = new GraphAnalyzer();
+		try {
+			k.runAnchorTextAnalysis();
+		}
+		finally {
+			k.close();
+		}
+	}
+
+	private IDocumentStorage docStorage;
+	private LinkDataStorage linkDataStorage;
+
+	public GraphAnalyzer() {
+		this.docStorage = new DocumentStorage("docStorage\\docStorage");
+		this.linkDataStorage = new LinkDataStorage("linkDataStorage\\linkDataStorage");
+	}
+
+	public void runAnchorTextAnalysis() {
+
+		long start = System.currentTimeMillis();
+		int i = 0;
+		for (HtmlDocument doc : docStorage.getAll()) {
+
+			if (i % 100 == 0)
+				System.out.println(i + "");
+
+			i++;
+
+			// Update entries for outgoing link's docs
+			HashMap<String, String> outgoingLinks = doc.getOutgoingLinks();			
+			for (String outgoingUrl : outgoingLinks.keySet()) {
+				DocumentLinkData outgoingLinkData = linkDataStorage.getDocumentLinkData(outgoingUrl);
+				if (outgoingLinkData == null)
+					outgoingLinkData = new DocumentLinkData();
+
+				outgoingLinkData.url = outgoingUrl;
+				if (outgoingLinkData.anchorText == null)
+					outgoingLinkData.anchorText = outgoingLinks.get(outgoingUrl);
+				else
+					outgoingLinkData.anchorText += " " + outgoingLinks.get(outgoingUrl);
+
+				linkDataStorage.putDocumentLinkData(outgoingLinkData);
+			}
+		}
+		long end = System.currentTimeMillis();
+		System.out.println("Done, took " + (end - start) + " milliseconds");
+	}
+
+	public void close() {
+		if (this.docStorage != null)
+			docStorage.close();
+
+		if (this.linkDataStorage != null)
+			linkDataStorage.close();
+	}
+
+}

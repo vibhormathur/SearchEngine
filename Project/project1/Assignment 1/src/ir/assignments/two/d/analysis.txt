@@ -1,0 +1,23 @@
+Below is the pseudocode for the palindrome algorithm with the corresponding runtime analysis:
+
+// Find palindromes
+for each word in the input array:                      O(n)
+  for each subsequent word left over:                  > O(n)
+     check if combination is a palindrome               >> O(m)
+     if it is a palindrome
+        add entry to dictionary or increment counter    >> O(1)
+        
+// Turn dictionary into Frequency array list
+for each dictionary entry, create a Frequency object   O(n)
+
+// Sort the list of Frequency objects
+do sort with Java's built-in sorting (merge sort)      O(n log n)
+
+Total:
+ = [n(n(m + 1))] + [n] + [n * log n]
+ = (n^2)(m + 1) + n + (n * log n)
+ = (m * n^2) + (n^2) + n + (n * log n)
+ = O(m * n^2)
+ where "n" is the size of the word list and "m" is the size of the words
+ 
+ ==> Overall the algorithm runs in polynomial time relative to the size of the input

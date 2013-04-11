@@ -1,0 +1,56 @@
+package ir.assignments.four.web;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import ir.assignments.four.ResultSet;
+import ir.assignments.four.SearchFiles;
+import ir.assignments.four.storage.DocumentStorage;
+import ir.assignments.four.storage.HtmlDocument;
+
+public class WebSearch {
+	private SearchFiles indexSearch;
+	private DocumentStorage docStorage;
+	
+	public WebSearch() {
+		try {
+			this.indexSearch = new SearchFiles("docIndexEnhanced");
+			this.docStorage = new DocumentStorage("docStorage\\docStorage");
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public WebResultSet search(String query, int page, int maxPerPage) {
+		ResultSet results = this.indexSearch.search(query, page, maxPerPage);
+		
+		// Create the results 
+		ArrayList<SearchResult> displayResults = new ArrayList<SearchResult>();
+		for (String url : results.getUrls()) {
+			String html = docStorage.getDocument(url);
+			HtmlDocument doc = new HtmlDocument(url, html);
+			
+			String title = doc.getTitle();
+			String description = doc.getBody();
+			description = description.substring(0, Math.min(100, description.length())).trim() + "...";
+			
+			SearchResult result = new SearchResult(title, url, description);
+			displayResults.add(result);
+		}
+		
+		SearchResult[] displayResultsArray = displayResults.toArray(new SearchResult[displayResults.size()]);
+		return new WebResultSet(displayResultsArray, results.getTotalHits(), page); 
+	}
+
+	public void close() {
+		if (this.indexSearch != null) {
+			this.indexSearch.close();
+		}
+		
+		if (this.docStorage != null) {
+			this.docStorage.close();
+		}
+	}
+}

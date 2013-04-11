@@ -1,0 +1,20 @@
+Team Members:
+  1) Armando Pensado Valle <apensado@uci.edu>
+  2) Vibhor Mathur <mathurv@uci.edu>
+
+Important Classes:
+ > GoogleSearcher.java: Gets search results from Google
+   - Assumptions: Exclude documents that were not part of the initial crawl goals or were inaccessible to the crawler
+ > NDCG.java: Implementation of NDCG scoring formula
+ > GraphAnalyzer.java: Collects anchor text data from crawled document storage. This class is run before indexing.
+ > Indexer.java: Creates the Lucene index.
+ > SearchFiles.java: Performs searches on the Lucene index
+ > MeasureSearchEffectiveness.java: Generates a summary of the NDCG@5 scores for the test queries provided in the project description.
+ > SearchOptimizer.java: Uses hill-climb to maximize the average NDCG@5 score of the test queries.
+
+External Libraries Used:
+ > Lucene
+ > jdbm2 (https://code.google.com/p/jdbm2/)
+   Library for file-backed HashMap and TreeMap (used for storing and retrieving crawled pages)
+ > jsoup (http://jsoup.org/)
+   Library for parsing HTML documents (better results than crawler4j HTML parser)

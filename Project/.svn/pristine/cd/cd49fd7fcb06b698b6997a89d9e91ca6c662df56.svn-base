@@ -1,0 +1,93 @@
+package ir.assignments.four;
+
+import ir.assignments.three.helpers.FileHelper;
+
+import java.io.File;
+import java.util.List;
+
+public class MeasureSearchEffectiveness {
+
+	public static void main(String[] args) {
+		String[] queries = new String[] { "mondego", "machine learning", "software engineering", "security", "student affairs",
+				                          "graduate courses", "Crista Lopes", "REST", "computer games", "information retrieval" };
+		
+		double totalScore = 0;
+		for (String query : queries) {
+			double score = getScore(query, false);
+			double originalScore = getOriginalScore(query);
+			double improvement = originalScore != -1 ? Math.round(((score - originalScore) / originalScore) * 100) : -1;
+			
+			System.out.println(query + ": " + score + (improvement != -1 ? " (" + improvement + "%)" : ""));
+			
+			totalScore += score;
+		}
+		
+		//System.out.println(getScore("software engineering", true));
+		
+		System.out.println("");
+		System.out.println("Average Score: " + (totalScore / queries.length));
+	}
+	
+	private static double getScore(String query, boolean printResults) {
+		try {
+			GoogleSearcher google = new GoogleSearcher();
+			SearchFiles localSearch = new SearchFiles("docIndex");
+			
+			List<String> googleResults = google.getSearchResults(query, 5);
+			List<String> localResults = localSearch.search(query, 5);
+			
+			if (printResults) {
+				printResults("Google", query, googleResults, true);
+				printResults("Local", query, localResults, false);
+			}
+			
+			// Calculate NDCG@5
+			return NDCG.getNDCG(localResults, googleResults, 5);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return -1;
+	}
+	
+	private static double getOriginalScore(String query) {
+		try {
+			File originalScores = new File("originalNDCG@5.txt");
+			if (originalScores.exists()) {
+				String content = FileHelper.readFile(originalScores, 0);
+				String[] lines = content.split(FileHelper.lineSeparator);
+				
+				for (String line : lines) {
+					if (line.startsWith(query)) {
+						int startIndex = line.indexOf(":");
+						if (startIndex > -1) {
+							startIndex += 2;
+							return Double.parseDouble(line.substring(startIndex));
+						}
+					}						
+				}
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return -1;
+	}
+	
+	private static void printResults(String header, String query, List<String> results, boolean checkLocalExistance) {
+		System.out.println(header + "(" + query + "):");
+		int rank = 1;
+		for (String result : results) {
+			boolean existsLocal = false;
+			if (checkLocalExistance) {
+				existsLocal = checkDocStorage.check(result);
+			}
+			
+			System.out.println(" " + rank + ": " + result + (checkLocalExistance ? " (crawled? " + existsLocal + ")" : ""));
+			rank++;
+		}
+	}
+
+}
